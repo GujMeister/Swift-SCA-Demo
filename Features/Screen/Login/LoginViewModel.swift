@@ -34,6 +34,7 @@ extension LoginViewModel {
         var otpCode: String = ""
         var errorMessage: String?
         var attemptsRemaining: Int?
+        var isInfoPagePresent: Bool = false
     }
     
     enum Intent {
@@ -43,6 +44,9 @@ extension LoginViewModel {
         case respondedToTrust(Bool)
         case cancelled
         case resetAfterSignOut
+        case showInfoPage
+        case dismissInfoPage
+        case autofillLoginData(MockUserProfile)
     }
 }
 
@@ -97,6 +101,13 @@ final class LoginViewModel: ViewModel {
             coordinator.userCancelled()
         case .resetAfterSignOut:
             resetAfterSignOut()
+        case .showInfoPage:
+            state.isInfoPagePresent = true
+        case .dismissInfoPage:
+            state.isInfoPagePresent = false
+        case .autofillLoginData(let user):
+            email = user.email
+            password = user.password
         }
     }
 }

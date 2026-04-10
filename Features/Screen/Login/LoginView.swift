@@ -10,7 +10,6 @@ import SCACore
 import Core
 
 struct LoginView: View {
-    
     @State
     private var viewModel = LoginViewModel(
         parameters: .init(),
@@ -20,125 +19,201 @@ struct LoginView: View {
     init() { }
     
     var body: some View {
+        content
+            .sheet(isPresented: showOTPSheet) { // MARK: OTP
+                OTPEntryView(
+                    method: otpMethod,
+                    onSubmit: { code in
+                        Task { await viewModel.process(.enteredOTP(code)) }
+                    },
+                    onCancel: {
+                        Task { await viewModel.process(.cancelled) }
+                    },
+                    onResend: {
+                        viewModel.coordinator.resendOTP()
+                    },
+                    cooldown: viewModel.coordinator.resendCooldown
+                )
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
+            }
+            .sheet(isPresented: showMethodPickerSheet) { // MARK: Method Picker View
+                MethodPickerView(
+                    methods: pickerMethods,
+                    reason: pickerReason,
+                    onSelect: { method in
+                        Task { await viewModel.process(.selectedMethod(method)) }
+                    },
+                    onCancel: {
+                        Task { await viewModel.process(.cancelled) }
+                    }
+                )
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
+            }
+            .sheet(isPresented: showTrustSheet) { // MARK: Trust Device Sheet
+                TrustDeviceView(
+                    onAccept: {
+                        Task { await viewModel.process(.respondedToTrust(true)) }
+                    },
+                    onDecline: {
+                        Task { await viewModel.process(.respondedToTrust(false)) }
+                    }
+                )
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
+            }
+            .sheet(isPresented: showInfoPageSheet) { // MARK: Info Sheet
+                InfoView { profileToAutofill in
+                    Task { await viewModel.process(.autofillLoginData(profileToAutofill)) }
+                }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+            }
+            .overlay(alignment: .top) { // MARK: Attempts Warning Banner
+                if let remaining = viewModel.state.attemptsRemaining {
+                    AttemptsWarningBanner(attemptsRemaining: remaining)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
+            .animation(.easeInOut(duration: 0.3), value: viewModel.state.attemptsRemaining)
+    }
+}
+
+// MARK: - Content
+
+private extension LoginView {
+    var content: some View {
         VStack(spacing: 24) {
+            header
+            loginFieldsHeader
+            loginFields
+            loginButton
+            Spacer()
+        }
+    }
+}
+
+// MARK: - Components
+
+private extension LoginView {
+
+    var header: some View {
+        HStack(spacing: .zero) {
+            Text("Login")
+                .font(.largeTitle.bold())
             
-            // MARK: - Header
+            Spacer()
             
-            Image(systemName: "lock.shield.fill")
-                .font(.system(size: 60))
-                .foregroundStyle(.blue)
-                .padding(.top, 40)
+            Button {
+                Task { await viewModel.process(.showInfoPage) }
+            } label: {
+                Image(systemName: "info.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.blue.gradient)
+                    .symbolRenderingMode(.hierarchical)
+            }
+        }
+        .padding(.horizontal, 24)
+    }
+
+    var loginFieldsHeader: some View {
+        VStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(.blue.gradient.opacity(0.15))
+                    .frame(width: 100, height: 100)
+                
+                Image(systemName: "lock.shield.fill")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.blue.gradient)
+                    .symbolRenderingMode(.hierarchical)
+            }
+            .padding(.top, 32)
             
-            Text("SCA Demo")
-                .font(.title.bold())
-            
-            // MARK: - Login Fields
-            
-            VStack(spacing: 16) {
+            VStack(spacing: 6) {
+                Text("SCA Demo")
+                    .font(.title.bold())
+                
+                Text("Strong Customer Authentication")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+    
+    var loginFields: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "envelope.fill")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 20)
+                
                 TextField("Email", text: $viewModel.email)
                     .textContentType(.emailAddress)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
-                    .padding()
-                    .background(.gray.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .padding(16)
+            .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 14))
+            
+            HStack(spacing: 12) {
+                Image(systemName: "lock.fill")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 20)
                 
                 SecureField("Password", text: $viewModel.password)
                     .textContentType(.password)
-                    .padding()
-                    .background(.gray.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .padding(.horizontal)
-            
-            // MARK: - Error
-            
-            if let error = viewModel.state.errorMessage {
-                Text(error)
-                    .foregroundStyle(.red)
-                    .font(.callout)
-            }
-            
-            // MARK: - Login Button
-            
+            .padding(16)
+            .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 14))
+        }
+        .padding(.horizontal)
+    }
+    
+    var loginButton: some View {
+        VStack(spacing: 16) {
             Button {
                 Task { await viewModel.process(.login) }
             } label: {
                 Group {
                     if case .verifying = viewModel.coordinator.currentStep {
                         ProgressView()
+                            .tint(.white)
                     } else {
-                        Text("Sign In")
+                        HStack(spacing: 8) {
+                            Text("Sign In")
+                                .font(.body.weight(.semibold))
+                            Image(systemName: "arrow.right")
+                                .font(.callout.weight(.semibold))
+                        }
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .padding()
-                .background(.blue)
+                .padding(.vertical, 16)
+                .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 14))
                 .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .disabled(isLoading)
             .padding(.horizontal)
             
-            Spacer()
-        }
-        .navigationTitle("Login")
-        
-        // MARK: - OTP Sheet
-        
-        .sheet(isPresented: showOTPSheet) {
-            OTPEntryView(
-                method: otpMethod,
-                onSubmit: { code in
-                    Task { await viewModel.process(.enteredOTP(code)) }
-                },
-                onCancel: {
-                    Task { await viewModel.process(.cancelled) }
-                },
-                onResend: {
-                    viewModel.coordinator.resendOTP()
-                },
-                cooldown: viewModel.coordinator.resendCooldown
-            )
-        }
-        
-        // MARK: - MethodPickerView
-        
-        .sheet(isPresented: showMethodPickerSheet) {
-            MethodPickerView(
-                methods: pickerMethods,
-                reason: pickerReason,
-                onSelect: { method in
-                    Task { await viewModel.process(.selectedMethod(method)) }
-                },
-                onCancel: {
-                    Task { await viewModel.process(.cancelled) }
+            if let error = viewModel.state.errorMessage {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .font(.caption)
+                    Text(error)
+                        .font(.caption)
                 }
-            )
-        }
-        
-        // MARK: - Trust Device Sheet
-        
-        .sheet(isPresented: showTrustSheet) {
-            TrustDeviceView(
-                onAccept: {
-                    Task { await viewModel.process(.respondedToTrust(true)) }
-                },
-                onDecline: {
-                    Task { await viewModel.process(.respondedToTrust(false)) }
-                }
-            )
-        }
-        
-        // MARK: - Attempts Warning Banner
-        
-        .overlay(alignment: .top) {
-            if let remaining = viewModel.state.attemptsRemaining {
-                AttemptsWarningBanner(attemptsRemaining: remaining)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                .foregroundStyle(.red)
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .animation(.easeInOut(duration: 0.3), value: viewModel.state.attemptsRemaining)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.state.errorMessage)
     }
 }
 
@@ -199,5 +274,12 @@ private extension LoginView {
             return method
         }
         return nil
+    }
+    
+    var showInfoPageSheet: Binding<Bool> {
+        Binding(
+            get: { viewModel.state.isInfoPagePresent },
+            set: { if !$0 { Task { await viewModel.process(.dismissInfoPage) } } }
+        )
     }
 }
