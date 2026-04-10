@@ -15,27 +15,43 @@ struct MethodPickerView: View {
     let onCancel: () -> Void
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 16) {
+        VStack(spacing: 20) {
+            ZStack {
+                Circle()
+                    .fill(.blue.gradient.opacity(0.15))
+                    .frame(width: 70, height: 70)
+                
                 Image(systemName: reason.iconName)
-                    .font(.system(size: 50))
-                    .foregroundStyle(.blue)
+                    .font(.system(size: 32))
+                    .foregroundStyle(.blue.gradient)
+                    .symbolRenderingMode(.hierarchical)
+            }
+            .padding(.top, 24)
+            
+            VStack(spacing: 6) {
+                Text("Choose Method")
+                    .font(.title3.bold())
                 
-                Text("Choose verification method")
-                    .font(.headline)
-                
+                Text("Pick how you'd like to verify")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            
+            VStack(spacing: 10) {
                 ForEach(methods, id: \.identifier) { method in
                     Button {
                         onSelect(method)
                     } label: {
-                        HStack(spacing: 16) {
+                        HStack(spacing: 14) {
                             Image(systemName: method.iconName)
                                 .font(.title3)
+                                .foregroundStyle(.blue.gradient)
                                 .frame(width: 32)
                             
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(method.displayName)
-                                    .font(.body.weight(.medium))
+                                    .font(.body.weight(.semibold))
+                                    .foregroundStyle(.primary)
                                 Text(method.description)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
@@ -44,21 +60,18 @@ struct MethodPickerView: View {
                             Spacer()
                             
                             Image(systemName: "chevron.right")
-                                .foregroundStyle(.secondary)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.tertiary)
                         }
-                        .padding()
-                        .background(.gray.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding(14)
+                        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 14))
                     }
-                    .tint(.primary)
                 }
             }
-            .padding()
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel", action: onCancel)
-                }
-            }
+            .padding(.horizontal)
+            
+            Spacer()
         }
+        .padding(.top, 8)
     }
 }

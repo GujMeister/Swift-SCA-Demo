@@ -18,48 +18,69 @@ struct OTPEntryView: View {
     @State private var code = ""
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 24) {
+        VStack(spacing: 24) {
+            ZStack {
+                Circle()
+                    .fill(.blue.gradient.opacity(0.15))
+                    .frame(width: 80, height: 80)
+                
                 Image(systemName: method?.iconName ?? "lock.fill")
-                    .font(.system(size: 50))
-                    .foregroundStyle(.blue)
+                    .font(.system(size: 36))
+                    .foregroundStyle(.blue.gradient)
+                    .symbolRenderingMode(.hierarchical)
+            }
+            .padding(.top, 24)
+            
+            VStack(spacing: 6) {
+                Text("Verification Code")
+                    .font(.title3.bold())
                 
-                Text(method?.description ?? "Enter code")
-                    .font(.headline)
-                
-                TextField("Enter 6-digit code", text: $code)
-                    .keyboardType(.numberPad)
+                Text(method?.description ?? "Enter the 6-digit code")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                    .font(.title2.monospaced())
-                    .padding()
-                    .background(.gray.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .padding(.horizontal)
-                
-                Button("Verify") { onSubmit(code) }
-                    .disabled(code.count < 6)
-                    .buttonStyle(.borderedProminent)
-                
-                // MARK: - Resend
-                
-                Button {
-                    onResend()
-                } label: {
-                    if cooldown > 0 {
-                        Text("Resend code in \(cooldown)s")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text("Resend code")
-                    }
-                }
-                .disabled(cooldown > 0)
-                .font(.subheadline)
             }
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel", action: onCancel)
+            
+            TextField("000000", text: $code)
+                .keyboardType(.numberPad)
+                .multilineTextAlignment(.center)
+                .font(.title.monospaced().weight(.semibold))
+                .tracking(8)
+                .padding(.vertical, 18)
+                .frame(maxWidth: .infinity)
+                .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 14))
+                .padding(.horizontal)
+            
+            Button {
+                onSubmit(code)
+            } label: {
+                Text("Verify")
+                    .font(.body.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 14))
+                    .foregroundStyle(.white)
+                    .opacity(code.count < 6 ? 0.5 : 1)
+            }
+            .disabled(code.count < 6)
+            .padding(.horizontal)
+            
+            Button {
+                onResend()
+            } label: {
+                if cooldown > 0 {
+                    Text("Resend in \(cooldown)s")
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Resend code")
+                        .foregroundStyle(.blue)
                 }
             }
+            .font(.subheadline.weight(.medium))
+            .disabled(cooldown > 0)
+            
+            Spacer()
         }
+        .padding(.top, 8)
     }
 }
