@@ -117,6 +117,10 @@ public final class SCAFlowCoordinator {
 // MARK: - UserInteraction Conformance
 
 extension SCAFlowCoordinator: UserInteraction {
+    public func hasPrefilledCredential(for category: PSD2Category) -> Bool {
+        prefilled[category] != nil
+    }
+    
     public func selectAuthenticationMethod(
         from methods: [AuthenticationMethod],
         reason: ChallengeReason

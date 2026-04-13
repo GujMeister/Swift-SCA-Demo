@@ -113,14 +113,19 @@ public final class DebugController {
     // MARK: - Device Trust Actions
     
     public func toggleDeviceTrust() async {
+        let deviceId = await storage.getDeviceId()
+        
         if isDeviceTrusted {
             await storage.clearDeviceTrust()
+            server.revokeTrustedDevice(deviceId: deviceId)
         } else {
             try? await storage.markDeviceAsTrusted()
+            server.registerTrustedDevice(deviceId: deviceId)
         }
+        
         isDeviceTrusted = await storage.isDeviceTrusted()
         trustDaysRemaining = await storage.getDaysUntilTrustExpiry()
-        print("🔧 DEBUG: Device trust = \(isDeviceTrusted)")
+        print("🔧 DEBUG: Device trust = \(isDeviceTrusted) (synced to server)")
     }
     
     // MARK: - Token Actions

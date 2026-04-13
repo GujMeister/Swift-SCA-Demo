@@ -18,6 +18,7 @@ public final class MockSCAServer {
     private var submittedProofs: [String: [AuthenticationProof]] = [:]
     private var failedAttempts: [String: Int] = [:]
     private var challengeExpiry: [String: Date] = [:]
+    private var trustedDeviceIds: Set<String> = []
     
     public init(config: Configuration = Configuration()) {
         self.config = config
@@ -137,7 +138,14 @@ public final class MockSCAServer {
         let allProofs = submittedProofs[proof.challengeId]!
         let reason = challengeReasons[proof.challengeId] ?? .login
         
-        let satisfiedCategories = Set(allProofs.map { $0.method.category })
+        var satisfiedCategories = Set(allProofs.map { $0.method.category })
+        
+        if let context = proof.deviceContext,
+           context.claimsTrustedStatus,
+           trustedDeviceIds.contains(context.deviceId) {
+            print("MOCK SERVER: Device \(context.deviceId.prefix(8))… is trusted — granting possession implicitly 🔓")
+            satisfiedCategories.insert(.possession)
+        }
         
         print("MOCK SERVER: Proof verified ✅ — method: \(proof.method.identifier), satisfied categories: \(satisfiedCategories.map(\.rawValue))")
         
@@ -166,6 +174,22 @@ public final class MockSCAServer {
             throw MockServerError.accountNotFound("no active user")
         }
         print("MOCK SERVER: OTP sent via \(method.identifier) — use code '123456'")
+    }
+    
+    // MARK: - Device Trust
+    
+    public func registerTrustedDevice(deviceId: String) {
+        trustedDeviceIds.insert(deviceId)
+        print("MOCK SERVER: Device \(deviceId.prefix(8))… registered as trusted ✅")
+    }
+    
+    public func revokeTrustedDevice(deviceId: String) {
+        trustedDeviceIds.remove(deviceId)
+        print("MOCK SERVER: Device \(deviceId.prefix(8))… trust revoked")
+    }
+    
+    public func isDeviceTrustedOnServer(deviceId: String) -> Bool {
+        trustedDeviceIds.contains(deviceId)
     }
     
     // MARK: - Token Refresh
@@ -206,6 +230,15 @@ public extension MockSCAServer {
     
     var currentFailedAttempts: [String: Int] {
         failedAttempts
+    }
+    
+    func clearAllTrustedDevices() {
+        trustedDeviceIds.removeAll()
+        print("🔧 DEBUG: All trusted devices cleared")
+    }
+    
+    var currentTrustedDevices: Set<String> {
+        trustedDeviceIds
     }
 }
 

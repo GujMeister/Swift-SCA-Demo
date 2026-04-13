@@ -46,6 +46,16 @@ public final class RealSCAProvider: SCAProvider {
         return try server.refreshToken(refreshToken)
     }
     
+    public func registerTrustedDevice(deviceId: String) async throws {
+        try await simulateNetworkDelay()
+        server.registerTrustedDevice(deviceId: deviceId)
+    }
+    
+    public func revokeTrustedDevice(deviceId: String) async throws {
+        try await simulateNetworkDelay()
+        server.revokeTrustedDevice(deviceId: deviceId)
+    }
+    
     public func logout() async throws {
         try await simulateNetworkDelay()
         server.logout()

@@ -60,6 +60,13 @@
 			remoteGlobalIDString = D486E1FB2F59E56400571DF2;
 			remoteInfo = Core;
 		};
+		D49C5FFC2F8A683500EADF08 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D486E14B2F59E3E300571DF2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D486E1CC2F59E51300571DF2;
+			remoteInfo = ProviderLayer;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -261,6 +268,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				D49C5FFD2F8A683500EADF08 /* PBXTargetDependency */,
 				D486E22F2F59E88F00571DF2 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
@@ -465,6 +473,11 @@
 			isa = PBXTargetDependency;
 			target = D486E1FB2F59E56400571DF2 /* Core */;
 			targetProxy = D486E22E2F59E88F00571DF2 /* PBXContainerItemProxy */;
+		};
+		D49C5FFD2F8A683500EADF08 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D486E1CC2F59E51300571DF2 /* ProviderLayer */;
+			targetProxy = D49C5FFC2F8A683500EADF08 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
