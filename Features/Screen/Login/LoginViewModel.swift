@@ -35,10 +35,15 @@ extension LoginViewModel {
         var errorMessage: String?
         var attemptsRemaining: Int?
         var isInfoPagePresent: Bool = false
+        var coldStartCountdown: Int? = nil
+        var coldStartEmail: String? = nil
+        var deviceTrustedForDisplay: Bool?
+        var biometricsAvailableForDisplay: Bool?
     }
     
     enum Intent {
         case login
+        case triggerColdStart(email: String)
         case selectedMethod(AuthenticationMethod)
         case enteredOTP(String)
         case respondedToTrust(Bool)
@@ -47,6 +52,7 @@ extension LoginViewModel {
         case showInfoPage
         case dismissInfoPage
         case autofillLoginData(MockUserProfile)
+        case refreshPreconditions
     }
 }
 
@@ -102,12 +108,17 @@ final class LoginViewModel: ViewModel {
         case .resetAfterSignOut:
             resetAfterSignOut()
         case .showInfoPage:
+            await refreshPreconditions()
             state.isInfoPagePresent = true
         case .dismissInfoPage:
             state.isInfoPagePresent = false
         case .autofillLoginData(let user):
             email = user.email
             password = user.password
+        case .triggerColdStart(let email):
+            await triggerColdStart(email: email)
+        case .refreshPreconditions:
+            await refreshPreconditions()
         }
     }
 }
@@ -160,9 +171,43 @@ private extension LoginViewModel {
         }
     }
     
-    private func resetAfterSignOut() {
+    func resetAfterSignOut() {
         state.password = ""
         state.errorMessage = nil
         state.attemptsRemaining = nil
+    }
+    
+    func refreshPreconditions() async {
+        state.deviceTrustedForDisplay = await dependencies.scaService.isDeviceTrusted
+        let biometrics = DependencyContainer.shared.resolve(BiometricProvider.self)
+        state.biometricsAvailableForDisplay = await biometrics.isAvailable
+    }
+    
+    func triggerColdStart(email: String) async {
+        state.coldStartEmail = email
+        state.coldStartCountdown = 3
+        
+        for remaining in stride(from: 3, through: 1, by: -1) {
+            state.coldStartCountdown = remaining
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+        }
+        
+        state.coldStartCountdown = nil
+        
+        do {
+            let challenge = try await dependencies.scaService.startChallenge(
+                for: .login,
+                context: ChallengeContext(email: email)
+            )
+            
+            _ = try await dependencies.scaService.authenticate(challenge: challenge)
+            
+            let sessionMonitor = DependencyContainer.shared.resolve(SessionMonitor.self)
+            sessionMonitor.markSessionActive()
+            
+        } catch {
+            state.coldStartEmail = nil
+            state.errorMessage = "Cold-start failed — try manual login"
+        }
     }
 }

@@ -1,6 +1,6 @@
 //
 //  InfoView.swift
-//  Application
+//  FeatureLayer
 //
 //  Created by Luka Gujejiani on 10/04/2026.
 //
@@ -12,13 +12,25 @@ import SCACore
 struct InfoView: View {
     
     @Environment(\.dismiss) private var dismiss
-    let onSelect: (MockUserProfile) -> Void
+    
+    @State private var viewModel: InfoViewModel
+    
+    init(
+        onSelect: @escaping (MockUserProfile) -> Void,
+        onColdStart: @escaping (MockUserProfile) -> Void
+    ) {
+        _viewModel = State(wrappedValue: InfoViewModel(
+            parameters: .init(onSelect: onSelect, onColdStart: onColdStart),
+            dependencies: .resolve()
+        ))
+    }
     
     var body: some View {
         NavigationStack {
             List {
                 informationText
                 userSelectionSectionView
+                coldStartSectionView
                 userInfoSectionView
             }
             .navigationTitle("Information")
@@ -28,9 +40,14 @@ struct InfoView: View {
                     Button("Done") { dismiss() }
                 }
             }
+            .task {
+                await viewModel.process(.refreshPreconditions)
+            }
         }
     }
 }
+
+// MARK: - Sections
 
 private extension InfoView {
     var informationText: some View {
@@ -67,12 +84,12 @@ private extension InfoView {
         }
         .padding(.vertical, 4)
     }
-
+    
     var userSelectionSectionView: some View {
         Section {
             ForEach(MockUserProfile.allProfiles, id: \.email) { profile in
                 Button {
-                    onSelect(profile)
+                    Task { await viewModel.process(.selectedProfile(profile)) }
                     dismiss()
                 } label: {
                     profileRow(for: profile)
@@ -85,6 +102,71 @@ private extension InfoView {
             Text("Tap a user to auto-fill their credentials")
                 .font(.caption)
         }
+    }
+    
+    var coldStartSectionView: some View {
+        Section {
+            if viewModel.canColdStart {
+                ForEach(MockUserProfile.allProfiles.filter { !$0.inherenceMethods.isEmpty }, id: \.email) { profile in
+                    Button {
+                        Task { await viewModel.process(.triggeredColdStart(profile)) }
+                        dismiss()
+                    } label: {
+                        coldStartRow(for: profile)
+                    }
+                    .buttonStyle(.plain)
+                }
+            } else {
+                coldStartPreconditionsView
+            }
+        } header: {
+            Text("Simulate Cold Start")
+        } footer: {
+            Text("Auto-login using trusted device + biometrics, no password needed")
+                .font(.caption)
+        }
+    }
+    
+    var coldStartPreconditionsView: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "lock.shield.fill")
+                    .font(.callout)
+                    .foregroundStyle(.red)
+                
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Cold start unavailable")
+                        .font(.callout.weight(.semibold))
+                    
+                    if !viewModel.state.isDeviceTrusted {
+                        HStack(spacing: 6) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                            Text("Device trust is off — enable it in the Debug Panel")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    
+                    if !viewModel.state.isBiometricsAvailable {
+                        HStack(spacing: 6) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                            Text("Biometrics not enrolled — Simulator → Features → Face ID → Enrolled")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
     }
     
     var userInfoSectionView: some View {
@@ -213,6 +295,39 @@ private extension InfoView {
                 .foregroundStyle(.secondary)
                 .padding(8)
                 .background(.quaternary.opacity(0.5), in: Circle())
+        }
+        .padding(.vertical, 6)
+    }
+    
+    func coldStartRow(for profile: MockUserProfile) -> some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(.green.gradient)
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: "faceid")
+                    .font(.title3)
+                    .foregroundStyle(.white)
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(profile.displayName)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.primary)
+                
+                Text("Trusted device + Face ID")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer()
+            
+            Image(systemName: "bolt.fill")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.green)
+                .padding(8)
+                .background(.green.opacity(0.15), in: Circle())
         }
         .padding(.vertical, 6)
     }

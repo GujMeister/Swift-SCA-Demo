@@ -1,6 +1,6 @@
 //
 //  InfoView+Extensions.swift
-//  Application
+//  FeatureLayer
 //
 //  Created by Luka Gujejiani on 10/04/2026.
 //

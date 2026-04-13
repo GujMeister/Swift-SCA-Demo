@@ -92,17 +92,6 @@
 		D486E1FC2F59E56400571DF2 /* Core.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Core.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D46D7A552F891497000BB626 /* Exceptions for "Features" folder in "Application" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Screen/Info/InfoView.swift,
-				"Screen/Info/InfoView+Extensions.swift",
-			);
-			target = D486E1EB2F59E54B00571DF2 /* Application */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D486E1CE2F59E51300571DF2 /* Providers */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -111,9 +100,6 @@
 		};
 		D486E1DE2F59E51C00571DF2 /* Features */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				D46D7A552F891497000BB626 /* Exceptions for "Features" folder in "Application" target */,
-			);
 			path = Features;
 			sourceTree = "<group>";
 		};

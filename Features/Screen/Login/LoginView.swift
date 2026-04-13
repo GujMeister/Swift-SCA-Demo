@@ -8,6 +8,7 @@
 import SwiftUI
 import SCACore
 import Core
+import ProviderLayer
 
 struct LoginView: View {
     @State
@@ -67,9 +68,22 @@ struct LoginView: View {
                 .presentationCornerRadius(28)
             }
             .sheet(isPresented: showInfoPageSheet) { // MARK: Info Sheet
-                InfoView { profileToAutofill in
-                    Task { await viewModel.process(.autofillLoginData(profileToAutofill)) }
-                }
+                InfoView(
+                    onSelect: { profile in
+                        Task {
+                            await viewModel.process(
+                                .autofillLoginData(profile)
+                            )
+                        }
+                    },
+                    onColdStart: { profile in
+                        Task {
+                            await viewModel.process(
+                                .triggerColdStart(email: profile.email)
+                            )
+                        }
+                    }
+                )
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
             }
@@ -80,6 +94,11 @@ struct LoginView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: viewModel.state.attemptsRemaining)
+            .overlay { // MARK: Cold start overlay
+                if let countdown = viewModel.state.coldStartCountdown {
+                    coldStartOverlay(countdown: countdown)
+                }
+            }
     }
 }
 
@@ -214,6 +233,45 @@ private extension LoginView {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: viewModel.state.errorMessage)
+    }
+
+    func coldStartOverlay(countdown: Int) -> some View {
+        ZStack {
+            Color.black.opacity(0.4)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 20) {
+                ZStack {
+                    Circle()
+                        .stroke(.white.opacity(0.2), lineWidth: 6)
+                        .frame(width: 100, height: 100)
+                    
+                    Circle()
+                        .trim(from: 0, to: CGFloat(countdown) / 3.0)
+                        .stroke(.white, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                        .frame(width: 100, height: 100)
+                        .rotationEffect(.degrees(-90))
+                        .animation(.easeInOut(duration: 1), value: countdown)
+                    
+                    Text("\(countdown)")
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                }
+                
+                VStack(spacing: 6) {
+                    Text("Simulating Cold Start")
+                        .font(.title3.bold())
+                        .foregroundStyle(.white)
+                    
+                    Text("Trusted device + biometrics")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.8))
+                }
+            }
+            .padding(32)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
+        }
+        .transition(.opacity)
     }
 }
 

@@ -22,6 +22,7 @@ public final class RealSecureStorage: SecureStorage {
     private let deviceId: String
     private let deviceName: String?
     private var tokenIssuedAt: Date?
+    private var lastUserEmail: String?
     
     // MARK: - Init
     
@@ -65,6 +66,20 @@ public final class RealSecureStorage: SecureStorage {
     public func clearAuthenticationToken() async {
         authToken = nil
         tokenIssuedAt = nil
+    }
+    
+    // MARK: - Last User
+    
+    public func getLastUserEmail() async -> String? {
+        lastUserEmail
+    }
+    
+    public func setLastUserEmail(_ email: String) async {
+        lastUserEmail = email
+    }
+    
+    public func clearLastUserEmail() async {
+        lastUserEmail = nil
     }
     
     // MARK: - Refresh Tokens
