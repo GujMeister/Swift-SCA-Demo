@@ -35,6 +35,11 @@ struct OTPEntryView: View {
                 Text("Verification Code")
                     .font(.title3.bold())
                 
+                Text("Always 123456 for demo reasons")
+                    .font(.subheadline)
+                    .foregroundStyle(.orange)
+                    .multilineTextAlignment(.center)
+                
                 Text(method?.description ?? "Enter the 6-digit code")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -50,6 +55,11 @@ struct OTPEntryView: View {
                 .frame(maxWidth: .infinity)
                 .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 14))
                 .padding(.horizontal)
+                .onChange(of: code) { _, newValue in
+                    if newValue.count > 6 {
+                        code = String(newValue.prefix(6))
+                    }
+                }
             
             Button {
                 onSubmit(code)
