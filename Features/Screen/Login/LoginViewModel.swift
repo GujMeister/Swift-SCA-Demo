@@ -39,6 +39,7 @@ extension LoginViewModel {
         var coldStartEmail: String? = nil
         var deviceTrustedForDisplay: Bool?
         var biometricsAvailableForDisplay: Bool?
+        var isSignInLoading: Bool = false
     }
     
     enum Intent {
@@ -135,6 +136,8 @@ private extension LoginViewModel {
         
         state.errorMessage = nil
         state.attemptsRemaining = nil
+        state.isSignInLoading = true
+        defer { state.isSignInLoading = false }
         
         do {
             let challenge = try await dependencies.scaService.startChallenge(

@@ -130,10 +130,17 @@ private extension LoginView {
             Button {
                 Task { await viewModel.process(.showInfoPage) }
             } label: {
-                Image(systemName: "info.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(.blue.gradient)
-                    .symbolRenderingMode(.hierarchical)
+                HStack(spacing: 6) {
+                    Image(systemName: "info.circle.fill")
+                        .font(.title3)
+                        .symbolRenderingMode(.hierarchical)
+                    Text("Info")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .foregroundStyle(.blue.gradient)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(.blue.opacity(0.12), in: Capsule())
             }
         }
         .padding(.horizontal, 24)
@@ -200,17 +207,19 @@ private extension LoginView {
             Button {
                 Task { await viewModel.process(.login) }
             } label: {
-                Group {
-                    if case .verifying = viewModel.coordinator.currentStep {
+                ZStack {
+                    HStack(spacing: 8) {
+                        Text("Sign In")
+                            .font(.body.weight(.semibold))
+                        Image(systemName: "arrow.right")
+                            .font(.callout.weight(.semibold))
+                    }
+                    .opacity(viewModel.state.isSignInLoading ? 0 : 1)
+                    
+                    if viewModel.state.isSignInLoading {
                         ProgressView()
                             .tint(.white)
-                    } else {
-                        HStack(spacing: 8) {
-                            Text("Sign In")
-                                .font(.body.weight(.semibold))
-                            Image(systemName: "arrow.right")
-                                .font(.callout.weight(.semibold))
-                        }
+                            .controlSize(.regular)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -218,7 +227,7 @@ private extension LoginView {
                 .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 14))
                 .foregroundStyle(.white)
             }
-            .disabled(isLoading)
+            .disabled(viewModel.state.isSignInLoading)
             .padding(.horizontal)
             
             if let error = viewModel.state.errorMessage {
@@ -300,11 +309,6 @@ private extension LoginView {
             return reason
         }
         return .login
-    }
-    
-    var isLoading: Bool {
-        if case .verifying = viewModel.coordinator.currentStep { return true }
-        return false
     }
     
     var showOTPSheet: Binding<Bool> {
