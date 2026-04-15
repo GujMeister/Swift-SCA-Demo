@@ -1,6 +1,15 @@
 {
-  "originHash" : "ea023d445a84aca3f8b490430db81e20704f313a713e93e8951af7202d3d768b",
+  "originHash" : "9d96706805ac88d2ae908b7904e0f56d32298870140c23873ecca846629e640a",
   "pins" : [
+    {
+      "identity" : "scacore",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/GujMeister/SCACore",
+      "state" : {
+        "branch" : "main",
+        "revision" : "82b0420a867d18178793576c06ebd2a9980a54ff"
+      }
+    },
     {
       "identity" : "swinject",
       "kind" : "remoteSourceControl",

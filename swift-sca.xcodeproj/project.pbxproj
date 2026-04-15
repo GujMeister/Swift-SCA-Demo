@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D46FD5222F75C72F0023EF15 /* SCACore in Frameworks */ = {isa = PBXBuildFile; productRef = D46FD5212F75C72F0023EF15 /* SCACore */; };
-		D48646C92F5C980400571DF2 /* SCACore in Frameworks */ = {isa = PBXBuildFile; productRef = D48646C82F5C980400571DF2 /* SCACore */; };
-		D48646D62F5CAC6D00571DF2 /* SCACore in Frameworks */ = {isa = PBXBuildFile; productRef = D48646D52F5CAC6D00571DF2 /* SCACore */; };
+		D41CD15C2F8FE7CA004B233F /* SCACore in Frameworks */ = {isa = PBXBuildFile; productRef = D41CD15B2F8FE7CA004B233F /* SCACore */; };
+		D41CD15E2F8FE7EB004B233F /* SCACore in Frameworks */ = {isa = PBXBuildFile; productRef = D41CD15D2F8FE7EB004B233F /* SCACore */; };
+		D41CD1602F8FE7F1004B233F /* SCACore in Frameworks */ = {isa = PBXBuildFile; productRef = D41CD15F2F8FE7F1004B233F /* SCACore */; };
 		D486E2022F59E56400571DF2 /* Core.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D486E1FC2F59E56400571DF2 /* Core.framework */; };
 		D486E2032F59E56400571DF2 /* Core.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D486E1FC2F59E56400571DF2 /* Core.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D486E20B2F59E86700571DF2 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = D486E20A2F59E86700571DF2 /* Swinject */; };
@@ -120,9 +120,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D41CD1602F8FE7F1004B233F /* SCACore in Frameworks */,
 				D486E2202F59E88400571DF2 /* Swinject in Frameworks */,
 				D486E2212F59E88400571DF2 /* Core.framework in Frameworks */,
-				D48646C92F5C980400571DF2 /* SCACore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,9 +130,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D41CD15E2F8FE7EB004B233F /* SCACore in Frameworks */,
 				D486E22B2F59E88F00571DF2 /* Swinject in Frameworks */,
 				D486E22C2F59E88F00571DF2 /* Core.framework in Frameworks */,
-				D48646D62F5CAC6D00571DF2 /* SCACore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,7 +140,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D46FD5222F75C72F0023EF15 /* SCACore in Frameworks */,
+				D41CD15C2F8FE7CA004B233F /* SCACore in Frameworks */,
 				D486E20C2F59E86700571DF2 /* ProviderLayer.framework in Frameworks */,
 				D486E2022F59E56400571DF2 /* Core.framework in Frameworks */,
 				D486E2142F59E86700571DF2 /* FeatureLayer.framework in Frameworks */,
@@ -236,7 +236,7 @@
 			name = ProviderLayer;
 			packageProductDependencies = (
 				D486E21F2F59E88400571DF2 /* Swinject */,
-				D48646C82F5C980400571DF2 /* SCACore */,
+				D41CD15F2F8FE7F1004B233F /* SCACore */,
 			);
 			productName = Data;
 			productReference = D486E1CD2F59E51300571DF2 /* ProviderLayer.framework */;
@@ -263,7 +263,7 @@
 			name = FeatureLayer;
 			packageProductDependencies = (
 				D486E22A2F59E88F00571DF2 /* Swinject */,
-				D48646D52F5CAC6D00571DF2 /* SCACore */,
+				D41CD15D2F8FE7EB004B233F /* SCACore */,
 			);
 			productName = Presentation;
 			productReference = D486E1DD2F59E51C00571DF2 /* FeatureLayer.framework */;
@@ -291,7 +291,7 @@
 			name = Application;
 			packageProductDependencies = (
 				D486E20A2F59E86700571DF2 /* Swinject */,
-				D46FD5212F75C72F0023EF15 /* SCACore */,
+				D41CD15B2F8FE7CA004B233F /* SCACore */,
 			);
 			productName = Application;
 			productReference = D486E1EC2F59E54B00571DF2 /* Application.app */;
@@ -357,7 +357,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				D486E2082F59E85200571DF2 /* XCRemoteSwiftPackageReference "Swinject" */,
-				D486E2512F59FCF400571DF2 /* XCLocalSwiftPackageReference "../SCACore" */,
+				D49C35432F8FE30A00EADF08 /* XCRemoteSwiftPackageReference "SCACore" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D486E1542F59E3E300571DF2 /* Products */;
@@ -936,13 +936,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		D486E2512F59FCF400571DF2 /* XCLocalSwiftPackageReference "../SCACore" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../SCACore;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		D486E2082F59E85200571DF2 /* XCRemoteSwiftPackageReference "Swinject" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -952,22 +945,30 @@
 				minimumVersion = 2.10.0;
 			};
 		};
+		D49C35432F8FE30A00EADF08 /* XCRemoteSwiftPackageReference "SCACore" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GujMeister/SCACore";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		D46FD5212F75C72F0023EF15 /* SCACore */ = {
+		D41CD15B2F8FE7CA004B233F /* SCACore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D486E2512F59FCF400571DF2 /* XCLocalSwiftPackageReference "../SCACore" */;
+			package = D49C35432F8FE30A00EADF08 /* XCRemoteSwiftPackageReference "SCACore" */;
 			productName = SCACore;
 		};
-		D48646C82F5C980400571DF2 /* SCACore */ = {
+		D41CD15D2F8FE7EB004B233F /* SCACore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D486E2512F59FCF400571DF2 /* XCLocalSwiftPackageReference "../SCACore" */;
+			package = D49C35432F8FE30A00EADF08 /* XCRemoteSwiftPackageReference "SCACore" */;
 			productName = SCACore;
 		};
-		D48646D52F5CAC6D00571DF2 /* SCACore */ = {
+		D41CD15F2F8FE7F1004B233F /* SCACore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D486E2512F59FCF400571DF2 /* XCLocalSwiftPackageReference "../SCACore" */;
+			package = D49C35432F8FE30A00EADF08 /* XCRemoteSwiftPackageReference "SCACore" */;
 			productName = SCACore;
 		};
 		D486E20A2F59E86700571DF2 /* Swinject */ = {
