@@ -26,10 +26,10 @@ public struct MockUserProfile: Sendable {
 public extension MockUserProfile {
     
     /// Tech-savvy user: all methods available
-    static let luka = MockUserProfile(
-        email: "luka@mail.ge",
+    static let techSavvy = MockUserProfile(
+        email: "savvy@mail.ge",
         password: "123",
-        displayName: "Luka",
+        displayName: "Savvy",
         knowledgeMethods: [.password],
         possessionMethods: [.smsOTP, .emailOTP],
         inherenceMethods: [.faceID]
@@ -66,7 +66,7 @@ public extension MockUserProfile {
     )
     
     /// All available accounts
-    static let allProfiles: [MockUserProfile] = [.luka, .guest, .admin, .minimal]
+    static let allProfiles: [MockUserProfile] = [.techSavvy, .guest, .admin, .minimal]
     
     /// Look up by email (case-insensitive)
     static func find(email: String) -> MockUserProfile? {
